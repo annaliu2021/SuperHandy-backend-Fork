@@ -8,6 +8,7 @@ const TaskValidator = require('../service/taskValidator');
 const Notify = require('../models/notifyModel');
 const getexposurePlanPrices = require('../service/exposurePlan');
 const geocoding = require('../utils/geocoding');
+const statusMapping = require('../service/statusMapping');
 
 const tasks = {
     /* 確認地理資訊 */
@@ -72,7 +73,7 @@ const tasks = {
             return next(appError(400, '40302', '沒有權限'));
         }
         if (task.status !== 'draft') {
-            return next(appError(400, '40214', `任務狀態錯誤： ${task.status}`));
+            return next(appError(400, '40214', `任務狀態錯誤： ${statusMapping.taskStatusMapping[task.status]}`));
         }
         const user = await User.findOne({ _id: userId });
         if (taskTrans.superCoin >= user.superCoin) {
@@ -112,9 +113,9 @@ const tasks = {
         const currentDate = Date.now();
         let expiredAt;
         if (exposurePlan === '一般曝光' || exposurePlan === '黃金曝光') {
-        expiredAt = new Date(currentDate + 30 * 24 * 60 * 60 * 1000); // 30 天後
+            expiredAt = new Date(currentDate + 30 * 24 * 60 * 60 * 1000); // 30 天後
         } else if (exposurePlan === '限時曝光' || exposurePlan === '限時黃金曝光') {
-        expiredAt = new Date(currentDate + 7 * 24 * 60 * 60 * 1000); // 7 天後
+            expiredAt = new Date(currentDate + 7 * 24 * 60 * 60 * 1000); // 7 天後
         } else {
             // 預設為 1 天後
             expiredAt = new Date(currentDate + 1 * 24 * 60 * 60 * 1000);
@@ -127,7 +128,7 @@ const tasks = {
             {
                 userId: userId,
                 title: title,
-                status: 'publish',
+                status: 'published',
                 category: category,
                 description: description,
                 salary: salary,
@@ -162,7 +163,7 @@ const tasks = {
             return next(appError(403, '40302', '沒有權限'));
         }
         if (task.status !== 'draft') {
-            return next(appError(405, '40214', `任務狀態錯誤： ${task.status}`));
+            return next(appError(405, '40214', `任務狀態錯誤： ${statusMapping.taskStatusMapping[task.status]}`));
         }
         delete task.__v;
         task.taskId = task._id;
@@ -195,7 +196,7 @@ const tasks = {
             return next(appError(403, '40302', '沒有權限'));
         }
         if (task.status !== 'draft') {
-            return next(appError(405, '40214', `任務狀態錯誤 ${task.status}`));
+            return next(appError(405, '40214', `任務狀態錯誤： ${statusMapping.taskStatusMapping[task.status]}`));
         }
         await Task.findOneAndUpdate(
             { _id: taskId },
@@ -234,7 +235,7 @@ const tasks = {
             return next(appError(403, '40302', '沒有權限'));
         }
         if (task.status !== 'draft') {
-            return next(appError(405, '40214', `任務狀態錯誤${task.status}`));
+            return next(appError(405, '40214', `任務狀態錯誤： ${statusMapping.taskStatusMapping[task.status]}`));
         }
         await Task.findOneAndUpdate(
             { _id: taskId },
@@ -286,9 +287,9 @@ const tasks = {
         const currentDate = Date.now();
         let expiredAt;
         if (exposurePlan === '一般曝光' || exposurePlan === '黃金曝光') {
-        expiredAt = new Date(currentDate + 30 * 24 * 60 * 60 * 1000); // 30 天後
+            expiredAt = new Date(currentDate + 30 * 24 * 60 * 60 * 1000); // 30 天後
         } else if (exposurePlan === '限時曝光' || exposurePlan === '限時黃金曝光') {
-        expiredAt = new Date(currentDate + 7 * 24 * 60 * 60 * 1000); // 7 天後
+            expiredAt = new Date(currentDate + 7 * 24 * 60 * 60 * 1000); // 7 天後
         } else {
             // 預設為 1 天後
             expiredAt = new Date(currentDate + 1 * 24 * 60 * 60 * 1000);
@@ -352,9 +353,9 @@ const tasks = {
             return next(appError(403, '40302', '沒有權限'));
         }
         if (task.status !== 'unpublished') {
-            return next(appError(405, '40214', `任務狀態錯誤 ${task.status}`));
+            return next(appError(405, '40214', `任務狀態錯誤： ${statusMapping.taskStatusMapping[task.status]}`));
         }
-        const { title, category, description, imagesUrl, contactInfo, location } = req.body;
+        const { category, description, imagesUrl, contactInfo, location } = req.body;
         const address = location.address;
         const geocodingResult = await geocoding(address);
         if (geocodingResult.status !== 'OK') {
@@ -371,7 +372,6 @@ const tasks = {
             { _id: taskId },
             {
                 $set: {
-                    title: title,
                     category: category,
                     description: description,
                     imagesUrl: imagesUrl,
@@ -402,7 +402,7 @@ const tasks = {
             return next(appError(403, '40302', '沒有權限'));
         }
         if (task.status !== 'unpublished') {
-            return next(appError(405, '40214', `任務狀態錯誤 ${task.status}`));
+            return next(appError(405, '40214', `任務狀態錯誤： ${statusMapping.taskStatusMapping[task.status]}`));
         }
         // 這邊需要發送幫手被踢除的推播
         await Task.findOneAndUpdate(
@@ -436,31 +436,29 @@ const tasks = {
             return next(appError(403, '40302', '沒有權限'));
         }
         if (task.status !== 'published') {
-            return next(appError(405, '40214', `任務狀態錯誤 ${task.status}`));
+            return next(appError(405, '40214', `任務狀態錯誤： ${statusMapping.taskStatusMapping[task.status]}`));
         }
         // 推播通知
         const helpers = task.helpers;
-        const notifications = helpers.map(helper => {
-        const helpId = helper.helperId;
-          return {
-            userId: helpId,
-            tag: '幫手通知',
-            read: true,
-            description: `您待媒合的任務：「${task.title} 」已下架`,
-            taskId: taskId,
-            createdAt: Date.now(),
-          };
+        const notifications = helpers.map((helper) => {
+            const helpId = helper.helperId;
+            return {
+                userId: helpId,
+                tag: '幫手通知',
+                description: `您待媒合的任務：「${task.title} 」已下架`,
+                taskId: taskId,
+                createdAt: Date.now(),
+            };
         });
         await Notify.insertMany(notifications);
         await Notify.create({
             userId: req.user._id,
             tag: '案主通知',
-            read: true,
             description: `您待媒合的任務：「${task.title} 」已下架，無法被其他人查看該任務`,
             taskId: taskId,
             createdAt: Date.now(),
-        })
-        // 更新 Task
+        });
+        // 更新任務狀態為`已下架`
         await Task.findOneAndUpdate(
             { _id: taskId },
             {

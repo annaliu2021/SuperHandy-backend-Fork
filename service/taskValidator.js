@@ -44,22 +44,22 @@ module.exports = class TaskValidator {
             };
         }
         if (contactInfo) {
-            if (!contactInfo.name || !contactInfo.phone || !contactInfo.email) {
+            if (contactInfo.name && typeof contactInfo.name !== 'string' ) {
                 return {
                     status: false,
-                    msg: '聯絡人資訊未填寫完整!',
+                    msg: '聯絡人資訊名稱格式不正確!',
                 };
             }
-            if (typeof contactInfo.name !== 'string' || typeof contactInfo.phone !== 'string' || typeof contactInfo.email !== 'string') {
+            if (contactInfo.phone && typeof contactInfo.phone !== 'string' ) {
                 return {
                     status: false,
-                    msg: '聯絡人資訊格式錯誤!',
+                    msg: '聯絡人資訊手機格式不正確!',
                 };
             }
-            if (!validator.isEmail(contactInfo.email)) {
+            if (contactInfo.email && !validator.isEmail(contactInfo.email)) {
                 return {
                     status: false,
-                    msg: 'Email 格式不正確!',
+                    msg: '聯絡人資訊email格式不正確!',
                 };
             }
         }
@@ -83,12 +83,6 @@ module.exports = class TaskValidator {
         };
     }
     static checkPublish({ title, category, description, taskTrans, salary, exposurePlan, imagesUrl, contactInfo, location }) {
-        if (!title) {
-            return {
-                status: false,
-                msg: '未填寫任務標題!',
-            };
-        }
         if (!category || !categoryNames.includes(category)) {
             return {
                 status: false,
@@ -130,41 +124,37 @@ module.exports = class TaskValidator {
                 };
             }
         }
-        if (contactInfo) {
-            if (!contactInfo.name || !contactInfo.phone || !contactInfo.email) {
-                return {
-                    status: false,
-                    msg: '聯絡人資訊未填寫完整!',
-                };
-            }
-            if (typeof contactInfo.name !== 'string' || typeof contactInfo.phone !== 'string' || typeof contactInfo.email !== 'string') {
-                return {
-                    status: false,
-                    msg: '聯絡人資訊格式錯誤!',
-                };
-            }
-            if (!validator.isEmail(contactInfo.email)) {
-                return {
-                    status: false,
-                    msg: 'Email 格式不正確!',
-                };
-            }
+        if (!contactInfo || !contactInfo.name || !contactInfo.phone || !contactInfo.email) {
+            return {
+                status: false,
+                msg: '聯絡人資訊未填寫完整!',
+            };
         }
-        if (location) {
-            if (!location.city || !location.dist || !location.address) {
-                return {
-                    status: false,
-                    msg: '地址資訊未填寫完整!',
-                };
-            }
-            if (typeof location.city !== 'string' || typeof location.dist !== 'string' || typeof location.address !== 'string') {
-                return {
-                    status: false,
-                    msg: '地址資訊格式錯誤!',
-                };
-            }
+        if (typeof contactInfo.name !== 'string' || typeof contactInfo.phone !== 'string' || typeof contactInfo.email !== 'string') {
+            return {
+                status: false,
+                msg: '聯絡人資訊格式錯誤!',
+            };
         }
-        if (imagesUrl && !Array.isArray(imagesUrl)) {
+        if (!validator.isEmail(contactInfo.email)) {
+            return {
+                status: false,
+                msg: 'Email 格式不正確!',
+            };
+        }
+        if (!location || !location.city || !location.dist || !location.address) {
+            return {
+                status: false,
+                msg: '地址資訊未填寫完整!',
+            };
+        }
+        if (typeof location.city !== 'string' || typeof location.dist !== 'string' || typeof location.address !== 'string') {
+            return {
+                status: false,
+                msg: '地址資訊格式錯誤!',
+            };
+        }
+        if (!imagesUrl || !Array.isArray(imagesUrl)) {
             return {
                 status: false,
                 msg: '圖片路徑格式錯誤!',
@@ -176,12 +166,6 @@ module.exports = class TaskValidator {
         };
     }
     static checkUnpublishEdit({ title, category, description, imagesUrl, contactInfo, location }) {
-        if (!title) {
-            return {
-                status: false,
-                msg: '未填寫任務標題!',
-            };
-        }
         if (!category || !categoryNames.includes(category)) {
             return {
                 status: false,
@@ -194,41 +178,37 @@ module.exports = class TaskValidator {
                 msg: '任務描述格式錯誤!',
             };
         }
-        if (contactInfo) {
-            if (!contactInfo.name || !contactInfo.phone || !contactInfo.email) {
-                return {
-                    status: false,
-                    msg: '聯絡人資訊未填寫完整!',
-                };
-            }
-            if (typeof contactInfo.name !== 'string' || typeof contactInfo.phone !== 'string' || typeof contactInfo.email !== 'string') {
-                return {
-                    status: false,
-                    msg: '聯絡人資訊格式錯誤!',
-                };
-            }
-            if (!validator.isEmail(contactInfo.email)) {
-                return {
-                    status: false,
-                    msg: 'Email 格式不正確!',
-                };
-            }
+        if (!contactInfo || !contactInfo.name || !contactInfo.phone || !contactInfo.email) {
+            return {
+                status: false,
+                msg: '聯絡人資訊未填寫完整!',
+            };
         }
-        if (location) {
-            if (!location.city || !location.dist || !location.address) {
-                return {
-                    status: false,
-                    msg: '地址資訊未填寫完整!',
-                };
-            }
-            if (typeof location.city !== 'string' || typeof location.dist !== 'string' || typeof location.address !== 'string') {
-                return {
-                    status: false,
-                    msg: '地址資訊格式錯誤!',
-                };
-            }
+        if (typeof contactInfo.name !== 'string' || typeof contactInfo.phone !== 'string' || typeof contactInfo.email !== 'string') {
+            return {
+                status: false,
+                msg: '聯絡人資訊格式錯誤!',
+            };
         }
-        if (imagesUrl && !Array.isArray(imagesUrl)) {
+        if (!validator.isEmail(contactInfo.email)) {
+            return {
+                status: false,
+                msg: 'Email 格式不正確!',
+            };
+        }
+        if (!location || !location.city || !location.dist || !location.address) {
+            return {
+                status: false,
+                msg: '地址資訊未填寫完整!',
+            };
+        }
+        if (typeof location.city !== 'string' || typeof location.dist !== 'string' || typeof location.address !== 'string') {
+            return {
+                status: false,
+                msg: '地址資訊格式錯誤!',
+            };
+        }
+        if (!imagesUrl || !Array.isArray(imagesUrl)) {
             return {
                 status: false,
                 msg: '圖片路徑格式錯誤!',
@@ -237,6 +217,31 @@ module.exports = class TaskValidator {
         return {
             status: true,
             msg: 'success',
+        };
+    }
+    static checkUploadAcceptance({ submittedInfo }) {
+        if (!submittedInfo) {
+          return {
+            status: false,
+            msg: '未提交資訊',
+          };
+        }
+        const { imgUrls, comment } = submittedInfo;
+        if (!imgUrls || !Array.isArray(imgUrls)) {
+          return {
+            status: false,
+            msg: '圖片路徑格式錯誤',
+          };
+        }
+        if (!comment) {
+          return {
+            status: false,
+            msg: '未提交留言',
+          };
+        }
+        return {
+          status: true,
+          msg: 'success',
         };
     }
 };

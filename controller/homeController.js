@@ -9,24 +9,18 @@ const fakeExcellentHelperData = require('../db/fakeExcellentHelpers');
 
 const home = {
     getCompeletedCases: handleErrorAsync(async (req, res, next) => {
-        const tasks = await Task.find(
-            {},
+        const tasks = await Task.aggregate([
             {
+              $project: {
                 title: 1,
                 status: 1,
                 createAt: '$time.createdAt',
                 completedAt: '$time.completedAt',
-                location: {
-                    city: '$location.city',
-                    dist: '$location.dist',
-                    address: '$location.address',
-                    landmark: '$location.landmark',
-                    longitude: '$location.longitude',
-                    latitude: '$location.latitude',
-                },
                 salary: 1,
-            },
-        );
+                address: { $concat: ['$location.city', '$location.dist', '$location.address'] }
+              }
+            }
+        ]);
         res.status(200).json(
             getHttpResponse({
                 data: tasks,
@@ -37,25 +31,25 @@ const home = {
     getCompeletedReviews: handleErrorAsync(async (req, res, next) => {
         const reviews = await SuperhandyReview.aggregate([
             {
-              $lookup: {
-                from: 'users',
-                localField: 'userId',
-                foreignField: '_id',
-                as: 'user',
-              },
+                $lookup: {
+                    from: 'users',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'user',
+                },
             },
             {
-              $unwind: '$user',
+                $unwind: '$user',
             },
             {
-              $project: {
-                _id: 1,
-                comment: 1,
-                avatarPath: '$user.avatarPath',
-                name: '$user.lastName',
-              },
+                $project: {
+                    _id: 1,
+                    comment: 1,
+                    avatarPath: '$user.avatarPath',
+                    name: '$user.lastName',
+                },
             },
-          ]);
+        ]);
         const formattedReviews = reviews.map((review) => ({
             _id: review._id,
             comment: review.comment,
