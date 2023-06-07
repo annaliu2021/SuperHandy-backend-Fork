@@ -2895,7 +2895,7 @@
         "tags": [
           "Money"
         ],
-        "summary": "LinePay 確認支付，本支是給 LinePay (Confirm payment for LinePay)",
+        "summary": "LinePay 確認支付",
         "description": "",
         "parameters": [],
         "responses": {
@@ -2909,42 +2909,6 @@
             }
           }
         }
-      }
-    },
-    "/linepay/payment/{orderId}": {
-      "get": {
-        "tags": [
-          "Money"
-        ],
-        "summary": "確認消費者是否支付 LinePay 款項 (Check payment)",
-        "description": "",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "取得成功",
-            "schema": {
-              "$ref": "#/definitions/paymentConfirm"
-            }
-          },
-          "500": {
-            "description": "系統錯誤",
-            "schema": {
-              "$ref": "#/definitions/Error500"
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
       }
     },
     "/tasks/management/poster": {
@@ -3521,9 +3485,31 @@
     },
     "/chat/list": {
       "get": {
-        "description": "",
+        "tags": [
+          "Chat"
+        ],
+        "summary": "取得聊天室列表 (Get all chatRoom list)",
+        "description": "使用taskId作為聊天室的id。time表示最後一則訊息的時間。(無訊息時為null)",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "取得聊天室列表成功",
+            "schema": {
+              "$ref": "#/definitions/getChatRoomList"
+            }
+          },
+          "500": {
+            "description": "系統錯誤",
+            "schema": {
+              "$ref": "#/definitions/Error500"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/chat/history": {
@@ -5549,23 +5535,6 @@
         }
       }
     },
-    "paymentConfirm": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "type": "string",
-          "example": "success"
-        },
-        "data": {
-          "type": "string",
-          "example": "交易完成"
-        },
-        "message": {
-          "type": "string",
-          "example": "取得成功"
-        }
-      }
-    },
     "getChatRoomList": {
       "type": "object",
       "properties": {
@@ -5580,9 +5549,17 @@
               "type": "string",
               "example": "647a926ba395c8322f620164"
             },
-            "role": {
+            "title": {
+              "type": "string",
+              "example": "任務標題"
+            },
+            "selfRole": {
               "type": "string",
               "example": "helper"
+            },
+            "partnerRole": {
+              "type": "string",
+              "example": "poster"
             },
             "poster": {
               "type": "object",

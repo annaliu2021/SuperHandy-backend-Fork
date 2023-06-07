@@ -598,16 +598,13 @@ const paymentRequest = {
     message: '建立 linepay 訂單成功',
 };
 
-const paymentConfirm = {
-    status: 'success',
-    data: '交易完成',
-    message: '取得成功',
-};
 const getChatRoomList = {
     status: 'success',
     data: {
         taskId: '647a926ba395c8322f620164',
-        role: 'helper',
+        title: '任務標題',
+        selfRole: 'helper',
+        partnerRole: 'poster',
         poster: {
             firstName: '文芳',
             lastName: '翁',
@@ -678,7 +675,6 @@ module.exports = {
     getStarCounts,
     uploadImage,
     paymentRequest,
-    paymentConfirm,
     getChatRoomList,
     getChatHistory,
 };
