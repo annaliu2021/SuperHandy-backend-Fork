@@ -39,7 +39,7 @@ const accounts = {
     }),
     updateInfoForm: handleErrorAsync(async (req, res, next) => {
         const updateFields = {};
-        const acceptedFields = ['firstName', 'lastName', 'nickname', 'location', 'posterIntro', 'helperIntro', 'helperSkills'];
+        const acceptedFields = ['firstName', 'lastName', 'nickname', 'location', 'posterIntro', 'helperIntro', 'helperSkills', 'avatarPath'];
         const checkField = (field) => {
             if (req.body.hasOwnProperty(field)) {
                 updateFields[field] = req.body[field];
@@ -140,7 +140,7 @@ const accounts = {
     }),
     getPointsHistory: handleErrorAsync(async (req, res, next) => {
         let userTrans = await UserTrans.find({ userId: req.user._id });
-        userTrans = userTrans.filter(trans => {
+        userTrans = userTrans.filter((trans) => {
             return trans.linepay && trans.linepay.status === '交易完成';
         });
         const taskTrans = await TaskTrans.find({ userId: req.user._id });
