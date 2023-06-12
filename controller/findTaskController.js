@@ -127,6 +127,7 @@ const tasks = {
             category: task.category,
             description: task.description,
             imgUrls: task.imgUrls,
+            helperCount: task.helpers.length,
             viewerCount: task.viewers.length,
             posterInfo: {
                 lastName: task.userId.lastName,
@@ -335,7 +336,7 @@ const tasks = {
 
             const isValidDistance = validDistance(centerLongitude, centerLatitude, task.location.longitude, task.location.latitude, radius);
             // 如果有使用縣市地區作為條件，則檢查是否符合縣市地區條件。使用經緯度作為條件，則檢查是否符合距離條件
-            if (hasCityLocation) {
+            if (!hasGPS && hasCityLocation) {
                 const isValidCityDist = task.location.city.replace('台', '臺') === city.replace('台', '臺') && task.location.dist === dist;
                 // 檢查是否有吻合縣市地區
                 if (!isValidCityDist) {
@@ -386,12 +387,12 @@ const tasks = {
         );
     }),
     findTaskListHighlight: handleErrorAsync(async (req, res, next) => {
-        //find all tasks sort by viewerCount and limit 5
+        //find all tasks sort by viewerCount and limit 8
         const tasks = await Task.find({ status: 'published' }).sort({ 'viewers.length': -1 }).select('_id title imgUrls category');
         if (!tasks) {
             return next(appError(404, '40210', '查無資料'));
         }
-        const randomIndexList = getRandomIndexList(tasks.length, 5);
+        const randomIndexList = getRandomIndexList(tasks.length, 8);
         //format tasks
         let formattedTasks = [];
         tasks.forEach((task, index) => {
