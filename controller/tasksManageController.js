@@ -397,20 +397,25 @@ const tasks = {
                         path: 'reviews',
                         select: 'poster.star',
                     });
+                    console.log("------helperData------")
+                    console.log(helperData)
                     const categories = helperData.reduce((acc, task) => {
+                        console.log("------task.reviews-----")
+                        console.log(task.reviews)
                         const existingCategory = acc.find((category) => category.name === task.category);
                         if (existingCategory) {
-                            existingCategory.star += task.reviews.poster.star || 0;
+                            existingCategory.star += task.reviews?.poster?.star || 0;
                             existingCategory.totalReviews++;
                         } else {
                             acc.push({
                                 name: task.category,
-                                star: task.reviews.poster.star || 0,
+                                star: task.reviews?.poster?.star || 0,
                                 totalReviews: 1,
                             });
                         }
                         return acc;
                     }, []);
+                    
                     categories.forEach((category) => {
                         category.star = category.star / category.totalReviews;
                     });
@@ -449,6 +454,7 @@ const tasks = {
             publishedAt: task.time.publishedAt,
             expiredAt: task.time.expiredAt,
             status: statusMapping.taskStatusMapping[task.status] || '',
+            statusReason: task.statusReason || '',
             helper: helperName,
             poster: posterName,
             progressBar: {
@@ -523,6 +529,7 @@ const tasks = {
             {
                 $set: {
                     status: 'deleted',
+                    statusReason: '案主自行刪除任務',
                     helpers: task.helpers.map((helper) => ({
                         helperId: helper.helperId,
                         status: 'dropped',
@@ -1021,8 +1028,9 @@ const tasks = {
                     taskId: task._id,
                     createdAt: currentTime,
                 });
-                task.status = 'deleted';
-                await Task.findByIdAndUpdate(task._id, { $set: { status: 'deleted', 'time.updatedAt': Date.now() }});
+                await Task.findByIdAndUpdate(task._id, { $set: { status: 'deleted',
+                                                                 statusReason: '系統下架已過期任務',
+                                                                 'time.updatedAt': Date.now() }});
                 count++;
                 console.log(count)
             }
